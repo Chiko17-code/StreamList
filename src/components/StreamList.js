@@ -1,34 +1,76 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faEdit, faCheck, faUndo } from '@fortawesome/free-solid-svg-icons';
 
 function StreamList() {
-  const [input, setInput] = useState('');
   const [items, setItems] = useState([]);
+  const [input, setInput] = useState('');
+  const [editIndex, setEditIndex] = useState(null);
 
-  const handleAdd = () => {
-    if (input.trim() !== '') {
-      setItems([...items, input]);
-      setInput('');
+  const handleChange = (e) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = () => {
+    if (input.trim() === '') return;
+
+    if (editIndex !== null) {
+      const updated = [...items];
+      updated[editIndex].text = input;
+      setItems(updated);
+      setEditIndex(null);
+    } else {
+      setItems([...items, { text: input, completed: false }]);
     }
+
+    setInput('');
+  };
+
+  const handleEdit = (index) => {
+    setInput(items[index].text);
+    setEditIndex(index);
+  };
+
+  const handleDelete = (index) => {
+    const updated = items.filter((_, i) => i !== index);
+    setItems(updated);
+  };
+
+  const handleToggle = (index) => {
+    const updated = [...items];
+    updated[index].completed = !updated[index].completed;
+    setItems(updated);
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>StreamList</h1>
-      <p>Add your movies or shows below:</p>
+    <div>
+      <h2>EZTechMovie - StreamList</h2>
+      <p>Add and manage your favorite shows and movies.</p>
 
       <input
         type="text"
-        value={input}
         placeholder="Enter movie or show"
-        onChange={(e) => setInput(e.target.value)}
-        style={{ padding: '8px', marginRight: '10px' }}
+        value={input}
+        onChange={handleChange}
       />
-      <button onClick={handleAdd} style={{ padding: '8px' }}>Add</button>
+      <button onClick={handleSubmit}>
+        {editIndex !== null ? 'Update' : 'Add'}
+      </button>
 
-      {/* Show the list here */}
-      <ul style={{ marginTop: '20px' }}>
+      <ul>
         {items.map((item, index) => (
-          <li key={index} style={{ padding: '5px 0' }}>{item}</li>
+          <li key={index} style={{ textDecoration: item.completed ? 'line-through' : 'none' }}>
+            {item.text}
+            <button onClick={() => handleToggle(index)} title="Complete/Undo">
+              <FontAwesomeIcon icon={item.completed ? faUndo : faCheck} />
+            </button>
+            <button onClick={() => handleEdit(index)} title="Edit">
+              <FontAwesomeIcon icon={faEdit} />
+            </button>
+            <button onClick={() => handleDelete(index)} title="Delete">
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
+          </li>
         ))}
       </ul>
     </div>
@@ -36,4 +78,9 @@ function StreamList() {
 }
 
 export default StreamList;
+
+
+
+
+
 
