@@ -1,83 +1,60 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faEdit, faCheck, faUndo } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect } from 'react';
 
-function StreamList() {
-  const [items, setItems] = useState([]);
-  const [input, setInput] = useState('');
-  const [editIndex, setEditIndex] = useState(null);
+const StreamList = () => {
+  const [inputValue, setInputValue] = useState('');
+  const [items, setItems] = useState(() => {
+    const saved = localStorage.getItem('streamItems');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const handleChange = (e) => {
-    setInput(e.target.value);
+  useEffect(() => {
+    localStorage.setItem('streamItems', JSON.stringify(items));
+  }, [items]);
+
+  const handleAdd = () => {
+    if (!inputValue.trim()) return;
+    const newItem = { id: Date.now(), name: inputValue, completed: false };
+    setItems([...items, newItem]);
+    setInputValue('');
   };
 
-  const handleSubmit = () => {
-    if (input.trim() === '') return;
-
-    if (editIndex !== null) {
-      const updated = [...items];
-      updated[editIndex].text = input;
-      setItems(updated);
-      setEditIndex(null);
-    } else {
-      setItems([...items, { text: input, completed: false }]);
-    }
-
-    setInput('');
+  const handleDelete = (id) => {
+    setItems(items.filter(item => item.id !== id));
   };
 
-  const handleEdit = (index) => {
-    setInput(items[index].text);
-    setEditIndex(index);
-  };
-
-  const handleDelete = (index) => {
-    const updated = items.filter((_, i) => i !== index);
-    setItems(updated);
-  };
-
-  const handleToggle = (index) => {
-    const updated = [...items];
-    updated[index].completed = !updated[index].completed;
-    setItems(updated);
+  const handleToggleComplete = (id) => {
+    setItems(items.map(item =>
+      item.id === id ? { ...item, completed: !item.completed } : item
+    ));
   };
 
   return (
     <div>
       <h2>EZTechMovie - StreamList</h2>
       <p>Add and manage your favorite shows and movies.</p>
-
       <input
         type="text"
+        value={inputValue}
         placeholder="Enter movie or show"
-        value={input}
-        onChange={handleChange}
+        onChange={(e) => setInputValue(e.target.value)}
       />
-      <button onClick={handleSubmit}>
-        {editIndex !== null ? 'Update' : 'Add'}
-      </button>
+      <button onClick={handleAdd}>Add</button>
 
       <ul>
-        {items.map((item, index) => (
-          <li key={index} style={{ textDecoration: item.completed ? 'line-through' : 'none' }}>
-            {item.text}
-            <button onClick={() => handleToggle(index)} title="Complete/Undo">
-              <FontAwesomeIcon icon={item.completed ? faUndo : faCheck} />
-            </button>
-            <button onClick={() => handleEdit(index)} title="Edit">
-              <FontAwesomeIcon icon={faEdit} />
-            </button>
-            <button onClick={() => handleDelete(index)} title="Delete">
-              <FontAwesomeIcon icon={faTrash} />
-            </button>
+        {items.map(item => (
+          <li key={item.id} style={{ textDecoration: item.completed ? 'line-through' : 'none' }}>
+            {item.name}
+            <button onClick={() => handleToggleComplete(item.id)}>✓</button>
+            <button onClick={() => handleDelete(item.id)}>🗑️</button>
           </li>
         ))}
       </ul>
     </div>
   );
-}
+};
 
 export default StreamList;
+
 
 
 
