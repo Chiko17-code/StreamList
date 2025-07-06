@@ -1,12 +1,26 @@
-.header h1 {
-  color: #0011ff;
-  font-size: 3rem;
-  text-shadow: 2px 2px red;
+/* App.css or Cart.css */
+.cart {
+  background-color: #f4f4f4;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 10px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
 }
 
-.header p {
-  font-size: 1.1rem;
-  line-height: 1.6;
+button {
+  margin: 0 5px;
 }
 
+.product-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 10px;
+  border-radius: 8px;
+}
